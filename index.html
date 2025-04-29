@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analog Clock Centered</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 20px;
+    }
+
+    .digital-clock {
+      font-size: 3em;
+      margin-bottom: 30px;
+    }
+
+    .analog-clock {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      border: 8px solid #fff;
+      border-radius: 50%;
+      background: #000;
+      margin-bottom: 50px;
+    }
+
+    .hand {
+      position: absolute;
+      background: white;
+      top: 50%;
+      left: 50%;
+      transform-origin: bottom;
+      transform: rotate(90deg);
+      transition: all 0.05s linear;
+    }
+
+    .hand.hour {
+      width: 6px;
+      height: 60px;
+      background: #0ff;
+      margin-top: -60px;
+    }
+
+    .hand.minute {
+      width: 4px;
+      height: 90px;
+      background: #0f0;
+      margin-top: -90px;
+    }
+
+    .hand.second {
+      width: 2px;
+      height: 100px;
+      background: #f00;
+      margin-top: -100px;
+    }
+
+    .center-point {
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    /* Calculator */
+    .calculator {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 260px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+    }
+
+    .calculator input {
+      grid-column: span 4;
+      height: 50px;
+      font-size: 1.5em;
+      text-align: right;
+      padding: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .calculator button {
+      height: 50px;
+      font-size: 1.2em;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .calculator button:hover {
+      background: #555;
+    }
+
+    .calculator button.equal {
+      background: #0a84ff;
+      color: #fff;
+      grid-column: span 2;
+    }
+
+    .calculator button.clear {
+      background: #ff3b30;
+      color: #fff;
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Digital Clock -->
+  <div class="digital-clock" id="digitalClock">00:00:00</div>
+
+  <!-- Analog Clock -->
+  <div class="analog-clock">
+    <div class="hand hour" id="hourHand"></div>
+    <div class="hand minute" id="minuteHand"></div>
+    <div class="hand second" id="secondHand"></div>
+    <div class="center-point"></div>
+  </div>
+
+  <!-- Calculator -->
+  <div class="calculator">
+    <input type="text" id="calcDisplay" readonly>
+    <button onclick="appendCalc('7')">7</button>
+    <button onclick="appendCalc('8')">8</button>
+    <button onclick="appendCalc('9')">9</button>
+    <button onclick="appendCalc('/')">÷</button>
+    <button onclick="appendCalc('4')">4</button>
+    <button onclick="appendCalc('5')">5</button>
+    <button onclick="appendCalc('6')">6</button>
+    <button onclick="appendCalc('*')">×</button>
+    <button onclick="appendCalc('1')">1</button>
+    <button onclick="appendCalc('2')">2</button>
+    <button onclick="appendCalc('3')">3</button>
+    <button onclick="appendCalc('-')">−</button>
+    <button onclick="appendCalc('0')">0</button>
+    <button onclick="appendCalc('.')">.</button>
+    <button onclick="calculateResult()" class="equal">=</button>
+    <button onclick="appendCalc('+')">+</button>
+    <button onclick="clearCalc()" class="clear">C</button>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+
+      // Digital Clock
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('digitalClock').textContent = `${hours}:${minutes}:${seconds}`;
+
+      // Analog Clock
+      const secondDeg = now.getSeconds() * 6;
+      const minuteDeg = now.getMinutes() * 6 + now.getSeconds() * 0.1;
+      const hourDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5;
+
+      document.getElementById('secondHand').style.transform = `rotate(${secondDeg}deg) translateX(-50%)`;
+      document.getElementById('minuteHand').style.transform = `rotate(${minuteDeg}deg) translateX(-50%)`;
+      document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg) translateX(-50%)`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Calculator
+    let calcExpression = '';
+
+    function appendCalc(value) {
+      calcExpression += value;
+      document.getElementById('calcDisplay').value = calcExpression;
+    }
+
+    function calculateResult() {
+      try {
+        calcExpression = eval(calcExpression).toString();
+        document.getElementById('calcDisplay').value = calcExpression;
+      } catch (e) {
+        document.getElementById('calcDisplay').value = 'Error';
+        calcExpression = '';
+      }
+    }
+
+    function clearCalc() {
+      calcExpression = '';
+      document.getElementById('calcDisplay').value = '';
+    }
+  </script>
+
+</body>
+</html>
